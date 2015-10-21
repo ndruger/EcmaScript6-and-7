@@ -2,17 +2,24 @@
 // コールバック地獄
 // 単に非同期処理を逐次実行したいだけで、ネストのため見れたものではない
 // また、エラーハンドリングを1箇所に書けない
+
+function funcA(v, cb) {
+  setTimeout(function() {
+    cb(null, 'res')
+  })
+}
+
 funcA('a', function(err, resA) {
   if (err) {
     console.log(err);
     return;
   }
-  funcB('b', function(err, resB) {
+  funcA('b', function(err, resB) {
     if (err) {
       console.log(err);
       return;
     }
-    funcC('c', function(err, resC) {
+    funcA('c', function(err, resC) {
       if (err) {
         console.log(err);
         return;
@@ -21,13 +28,21 @@ funcA('a', function(err, resA) {
   });
 });
 
+
 // Promise
+
+function promisedFuncA(v) {
+  return new Promise(function(resolve, reject) {
+    resolve('res')
+  });
+}
+
 promisedFuncA('a')
   .then((resA) => {
-    return promisedFuncB('b');
+    return promisedFuncA('b');
   })
   .then((resB) => {
-    return promisedFuncC('c');
+    return promisedFuncA('c');
   })
   .then((resC) => {
   })
@@ -36,3 +51,17 @@ promisedFuncA('a')
     console.log(err);
   });
 
+
+// await and async
+
+async function asyncFunc() {
+  try {
+    let resA = await promisedFuncA('a');
+    let resB = await promisedFuncA('b');
+    let resC = await promisedFuncA('c');
+  } catch(e) {
+    console.log(e);
+  }
+}
+
+asyncFunc();
