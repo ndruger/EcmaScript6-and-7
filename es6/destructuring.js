@@ -21,3 +21,11 @@ try {
 
 // 配列のdestructuring
 let [head, ...rest] = array;
+
+
+// 関数の引数にも利用できる
+function func({a}) {
+  console.log(a);
+}
+
+func({a: 'v1'})
